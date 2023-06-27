@@ -3,8 +3,12 @@ import re
 
 class SQL:
     def __init__(self):
-        self.cnx = self.__connectSQL__()
-        self.cursor = self.cnx.cursor()
+
+        try:
+            self.cnx = self.__connectSQL__()
+            self.cursor = self.cnx.cursor()
+        except Exception :
+            print("SQL CONNECT ERROR! PLEASE CHANGE YOUR MYSQL SETTING!")
 
     def __connectSQL__(self):
         cnx = mysql.connector.connect(
