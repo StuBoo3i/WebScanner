@@ -206,11 +206,20 @@ def read_list_from_file():
     medium_risk = ['目录遍历漏洞', '文件上传和下载漏洞', 'XSS Href', 'XSS Stored', 'XSS JavaScript', 'XSS DOM']
     low_risk = ['CSRF漏洞', 'XSS POST Reflected', 'XSS GET Reflected']
     count = results[0]
-    for urls in results:
+    separator = ', '  # 指定分隔符
+    for urls in results[1:]:
         # 创建包含 url 和 count 的字典，并添加到 data 列表中
+        if list_vulnerability[cnx] in high_risk:
+            rank = '高危漏洞'
+        elif list_vulnerability[cnx] in medium_risk:
+            rank = '中危漏洞'
+        elif list_vulnerability[cnx] in low_risk:
+            rank = '低危漏洞'
         item = {
             'class': list_vulnerability[cnx],
-            'count': len(urls)
+            'count': count[cnx],
+            'rank': rank,
+            'urls': separator.join(urls)
         }
         data.append(item)
         cnx += 1
