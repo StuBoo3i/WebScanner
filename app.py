@@ -12,6 +12,7 @@ import label_data
 import flask
 import json
 from Web_Vulnerablility.main import scanweb
+from Web_Vulnerablility.main import read_list_from_file
 
 app = Flask(__name__)
 
@@ -134,16 +135,8 @@ def subthread_scan(url,scan_mode):
     scanweb(url, scan_mode)  # 扫描完成后设置弹窗提示信息
 @app.route('/result', methods=['GET','POST'])
 def result():
-    data = [
-        {
-            'url': 'https://example.com',
-            'count': 10
-        },
-        {
-            'url': 'https://example.org',
-            'count': 5
-        }
-    ]
+    data = read_list_from_file()
+    # print(data)
     return render_template('result.html', data=data)
 
 @app.route('/dashboard', methods=['GET','POST'])

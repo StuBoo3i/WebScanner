@@ -11,7 +11,8 @@ from Web_Vulnerablility.reptile.web_crawler import spider2_content
 from static.Tools.SQL.SQL_op import SQL
 from threading import Thread
 
-#合并列表
+
+# 合并列表
 def merge_results(list1, list2):
     merged_results = {}
 
@@ -61,7 +62,6 @@ def run_detection(url):
         if rce_result:
             result_str += "远程代码执行漏洞:" + rce_result
             print(result_str)
-
 
         # 检测XSS漏洞
         xss_result = check_xss_vulnerabilities(url)
@@ -189,9 +189,39 @@ def write_list_to_file(file_path, data_list):
             mysql.insertSQL(mysql.cnx, mysql.cursor, item)
     mysql.closeSQL(mysql.cursor, mysql.cnx)
 
-def scanweb(uel, scan_mode):
+
+def read_list_from_file():
+    mysql = SQL()  # 创建 SQL 类的实例
+    cursor = mysql.cursor  # 获取数据库连接的游标
+    results = mysql.selectSQL(cursor)  # 执行查询并获取结果
+    # print(results)
+    data = []
+    cnx = 0
+    list_vulnerability = ['暴力破解漏洞', '文件包含漏洞', '目录遍历漏洞', '文件上传和下载漏洞', 'SQL time blinds vulnerability',
+                          'SQL bool  blinds vulnerability', 'SQL inject vulnerability', 'CSRF漏洞', 'PHP反序列化漏洞',
+                          'XSS Href', 'XSS POST Reflected', 'XSS GET Reflected', 'XSS Stored', 'XSS JavaScript',
+                          'XSS DOM']
+    high_risk = ['暴力破解漏洞', '文件包含漏洞', 'SQL time blinds vulnerability', 'SQL bool blinds vulnerability',
+                 'SQL inject vulnerability', 'PHP反序列化漏洞']
+    medium_risk = ['目录遍历漏洞', '文件上传和下载漏洞', 'XSS Href', 'XSS Stored', 'XSS JavaScript', 'XSS DOM']
+    low_risk = ['CSRF漏洞', 'XSS POST Reflected', 'XSS GET Reflected']
+    count = results[0]
+    for urls in results:
+        # 创建包含 url 和 count 的字典，并添加到 data 列表中
+        item = {
+            'class': list_vulnerability[cnx],
+            'count': len(urls)
+        }
+        data.append(item)
+        cnx += 1
+    mysql.closeSQL(mysql.cursor, mysql.cnx)
+    return data
+
+
+def scanweb(url, scan_mode):
     result = scan_choose(url, scan_mode)
     write_list_to_file('result.txt', result)
+
 
 if __name__ == '__main__':
     url = 'http://192.168.1.192:8086/pikachu/'
@@ -207,5 +237,3 @@ if __name__ == '__main__':
     # result =
     # result_other = [['http://192.168.1.192:8086/pikachu/vul/xss/xss_reflected_get.php', 'SQL bool blinds  vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/sqli/sqli_del.php', 'SQL inject vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/xss/xss_02.php', 'SQL bool blinds  vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/sqli/sqli_search.php', 'SQL inject vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/sqli/sqli_blind_b.php', 'SQL bool blinds  vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/xss/xss_01.php', 'SQL bool blinds  vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/sqli/sqli_blind_t.php', 'SQL time blinds vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/sqli/sqli_str.php', 'SQL inject vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/sqli/sqli_id.php', 'SQL inject vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/sqli/sqli_x.php', 'SQL inject vulnerability']]
     write_list_to_file('result.txt', result)
-
-
