@@ -189,7 +189,7 @@ def write_list_to_file(file_path, data_list):
             mysql.insertSQL(mysql.cnx, mysql.cursor, item)
     mysql.closeSQL(mysql.cursor, mysql.cnx)
 
-def scanweb(url, scan_mode):
+def scanweb(uel, scan_mode):
     result = scan_choose(url, scan_mode)
     write_list_to_file('result.txt', result)
 
