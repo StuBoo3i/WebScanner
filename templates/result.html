@@ -144,15 +144,15 @@
                         </a>
                     </li>
                     <li class="tpl-left-nav-item">
-                        <a href="/fish" class="nav-link tpl-left-nav-link-list">
+                        <a href="/user" class="nav-link tpl-left-nav-link-list">
                             <i class="am-icon-bar-chart"></i>
-                            <span>钓鱼网站识别</span>
+                            <span>用户信息</span>
                         </a>
                     </li>
                     <li class="tpl-left-nav-item">
-                        <a href="/xueyuan" class="nav-link tpl-left-nav-link-list">
+                        <a href="/fish" class="nav-link tpl-left-nav-link-list">
                             <i class="am-icon-bar-chart"></i>
-                            <span>额外功能待开发...</span>
+                            <span>钓鱼网站识别</span>
                         </a>
                     </li>
                 </ul>
@@ -164,17 +164,16 @@
             <h1>漏洞</h1>
 
             <div class="icon-input">
-                <img src="icon.png" alt="填入图标">
-                <input type="text" placeholder="输入...">
+                <img src="icon.png" alt="图标">
+                <input type="text" placeholder="http://192.168.1.192:8086/pikachu">
             </div>
 
             <table>
                 <thead>
                     <tr>
-                        <th>严重性</th>
-                        <th>漏洞</th>
+                        <th>漏洞类型</th>
                         <th>计数</th>
-                        <th>类型</th>
+                        <th>严重性</th>
                         <th>详细信息</th>
                     </tr>
                 </thead>
@@ -182,17 +181,15 @@
                 <tbody>
                     {% for item in data %}
                     <tr>
-                        <td>{{ item.url }}</td>
+                        <td>{{ item.class }}</td>
                         <td>{{ item.count }}</td>
-                        <td>...</td>
-                        <td>...</td>
+                        <td>{{ item.rank }}</td>
                         <td>
                             <div class="dropdown">
                                 <span>查看</span>
                                 <div class="dropdown-content">
                                     <div class="dropdown-item">
                                         <div>URL: https://example.com</div>
-                                        <div>个数: 10</div>
                                     </div>
                                 </div>
                             </div>
