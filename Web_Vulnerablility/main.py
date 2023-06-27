@@ -8,7 +8,7 @@ from Web_Vulnerablility.XSS.main import check_xss_vulnerabilities
 from Web_Vulnerablility.dir_list.dir_list import check_directory_traversal
 from Web_Vulnerablility.file_upanddown.main import check_file_vulnerabilities
 from Web_Vulnerablility.reptile.web_crawler import spider2_content
-
+from threading import Thread
 
 #合并列表
 def merge_results(list1, list2):
@@ -27,6 +27,7 @@ def merge_results(list1, list2):
 def run_detection(url):
     results = []
     urls = spider2_content(url)
+    results_other = main(url)
     for url in urls:
         result_str = ""
 
@@ -81,11 +82,11 @@ def run_detection(url):
         if result_str:
             results.append([url, result_str.strip()])
             print([url, result_str])
-    results_other = main(url)
-    print(results)
-    print(results_other)
-    results = merge_results(results, results_other)
-    return results
+
+    # print(results)
+    # print(results_other)
+    result_sum = merge_results(results, results_other)
+    return result_sum
 
 
 def perform_xss_scan(url):
@@ -185,17 +186,19 @@ def write_list_to_file(file_path, data_list):
             file.write(str(item) + '\n')
 
 
-def scan(url, scan_mode):
-    # url = 'http://192.168.1.192:8086/pikachu/'
-    # scan_mode = 'full'
+if __name__ == '__main__':
+    url = 'http://192.168.1.192:8086/pikachu/'
+    scan_mode = 'full'
 
     result = scan_choose(url, scan_mode)
-    print(result)
+    # print(result)
     # result_str1 = ['http://192.168.1.192:8086/pikachu/xss_stored.php?id=3834', '暴力破解漏洞:表单暴力破解漏洞文件包含漏洞:远程文件包含漏洞']
     # result_str2 = ['http://192.168.1.192:8086/pikachu/xss_stored.php?id=3830', '暴力破解漏洞:表单暴力破解漏洞文件包含漏洞:远程文件包含漏洞']
     # result = []
     # result.append(result_str1)
     # result.append(result_str2)
-
+    # result =
+    # result_other = [['http://192.168.1.192:8086/pikachu/vul/xss/xss_reflected_get.php', 'SQL bool blinds  vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/sqli/sqli_del.php', 'SQL inject vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/xss/xss_02.php', 'SQL bool blinds  vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/sqli/sqli_search.php', 'SQL inject vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/sqli/sqli_blind_b.php', 'SQL bool blinds  vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/xss/xss_01.php', 'SQL bool blinds  vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/sqli/sqli_blind_t.php', 'SQL time blinds vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/sqli/sqli_str.php', 'SQL inject vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/sqli/sqli_id.php', 'SQL inject vulnerability'], ['http://192.168.1.192:8086/pikachu/vul/sqli/sqli_x.php', 'SQL inject vulnerability']]
     write_list_to_file('result.txt', result)
+
 
