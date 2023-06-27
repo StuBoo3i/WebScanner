@@ -12,6 +12,7 @@ import label_data
 import flask
 import json
 from Web_Vulnerablility.main import scanweb
+from static.Tools.SQL.SQL_op import SQL
 
 app = Flask(__name__)
 
@@ -28,9 +29,6 @@ def prepare_url(url):
         samples.append(k)
         labels.append(v)
 
-    # print(len(samples))
-    # print(len(labels))
-
     maxlen = 128
     max_words = 20000
 
@@ -46,10 +44,13 @@ def prepare_url(url):
     url_prepped = pad_sequences(sequences, maxlen=maxlen)
     return url_prepped
 
+
 # 写好的数据库连接函数，
 # 传入的是table，数据表的名称，
 # 返回值是数据表中所有的数据，以元祖的格式返回
 # 模拟已知的漏洞列表（可以根据实际情况进行修改）
+sql = SQL()
+counter = sql.selectSQL(sql.cursor)[0]
 vulnerabilities = {
     'XSS': '跨站脚本攻击（Cross-Site Scripting）',
     'SQLI': 'SQL 注入攻击（SQL Injection）',
@@ -58,47 +59,33 @@ vulnerabilities = {
 
 client_proxy = {
     "Internet Explorer 11": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko",
-    "Chrome":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36",
-    "Firefox":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:94.0) Gecko/20100101 Firefox/94.0",
-    "Safari":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15",
+    "Chrome": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36",
+    "Firefox": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:94.0) Gecko/20100101 Firefox/94.0",
+    "Safari": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15",
     "Default": ""
 }
 
 scan_mode = {
-    "全面扫描":2,
-    "快速扫描":1,
-    "SQL注入扫描":3,
-    "XSS扫描":4,
-    "暴力破解扫描":5,
-    "远程代码执行扫描":6,
+    "全面扫描": 2,
+    "快速扫描": 1,
+    "SQL注入扫描": 3,
+    "XSS扫描": 4,
+    "暴力破解扫描": 5,
+    "远程代码执行扫描": 6,
     "文件漏洞扫描": 7
 }
-# 示例数据
-low_vulnerabilities = 10
-medium_vulnerabilities = 20
-high_vulnerabilities = 15
-
-vulnerabilities_data = {
-    'SQL注入': 8,
-    'XSS': 12,
-    'CSRF': 5,
-    '暴力破解': 10
-}
-
-target_data = [
-    {'url': 'http://www.example.com', '低危漏洞': 3, '中危漏洞': 1, '高危漏洞': 0},
-    {'url': 'http://www.example.net', '低危漏洞': 2, '中危漏洞': 2, '高危漏洞': 1},
-    {'url': 'http://www.example.org', '低危漏洞': 1, '中危漏洞': 3, '高危漏洞': 2}
-]
 
 
 shared_data = {
 
 }
+
+
 # 启动服务器后运行的第一个函数，显示对应的网页内容
 @app.route('/', methods=['GET', 'POST'])
 def home():
     return render_template('login.html')
+
 
 # 对登录的用户名和密码进行判断
 @app.route('/login', methods=['POST'])
@@ -114,8 +101,9 @@ def login():
 def student_index():
     return render_template('student_index.html')
 
+
 # 显示教师首页的函数，可以显示首页里的信息
-@app.route('/scan', methods=['GET','POST'])
+@app.route('/scan', methods=['GET', 'POST'])
 def scan():
     message = ''
     if request.method == 'POST':
@@ -125,14 +113,18 @@ def scan():
         proxy_name = request.form['username']
         proxy_password = request.form['password']
         proxy = request.form['proxy']
-        thread_1 = Thread(target= subthread_scan,args=(url,scan_mode))
+        thread_1 = Thread(target=subthread_scan, args=(url, scan_mode))
         thread_1.start()
         message = "扫描已开始，请勿重复提交请求！"
         # 返回响应，并将提示信息传递给模板
     return render_template('scan.html', message=message)
-def subthread_scan(url,scan_mode):
+
+
+def subthread_scan(url, scan_mode):
     scanweb(url, scan_mode)  # 扫描完成后设置弹窗提示信息
-@app.route('/result', methods=['GET','POST'])
+
+
+@app.route('/result', methods=['GET', 'POST'])
 def result():
     data = [
         {
@@ -146,70 +138,104 @@ def result():
     ]
     return render_template('result.html', data=data)
 
-@app.route('/dashboard', methods=['GET','POST'])
+
+@app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
+    vulnerabilities_data = {
+        '暴力破解漏洞': counter[0],
+        '文件包含漏洞': counter[1],
+        'SQL time blinds vulnerability': counter[4],
+        'SQL bool blinds vulnerability': counter[5],
+        'SQL inject vulnerability': counter[6],
+        'PHP反序列化漏洞': counter[8],
+        '目录遍历漏洞': counter[2],
+        '文件上传和下载漏洞': counter[3],
+        'XSS Href': counter[9],
+        'XSS Stored': counter[12],
+        'XSS JavaScript': counter[13],
+        'XSS DOM' : counter[14],
+        'CSRF漏洞' : counter[7],
+        'XSS POST Reflected' : counter[10],
+        'XSS GET Reflected' : counter[11]
+    }
+
+    target_data = [
+        {'低危漏洞': counter[7]+counter[10]+counter[11],
+         '中危漏洞': counter[2]+counter[3]+counter[9]+counter[12]+counter[13]+counter[14],
+         '高危漏洞': counter[0]+counter[1]+counter[4]+counter[5]+counter[6]+counter[8]}
+    ]
     # 生成饼状图1
-    labels1 = ['低危漏洞', '中危漏洞', '高危漏洞']
-    values1 = [low_vulnerabilities, 0, 0]
+    """
+    高危漏洞列表： ['暴力破解漏洞', '文件包含漏洞', 'SQL time blinds vulnerability',
+     'SQL bool blinds vulnerability', 'SQL inject vulnerability', 'PHP反序列化漏洞']
+    中危漏洞列表： ['目录遍历漏洞', '文件上传和下载漏洞', 'XSS Href', 'XSS Stored', 'XSS JavaScript', 'XSS DOM']
+    低危漏洞列表： ['CSRF漏洞', 'XSS POST Reflected', 'XSS GET Reflected']
+    """
+
+    labels1 = ['CSRF漏洞', 'XSS POST Reflected', 'XSS GET Reflected']
+    values1 = [counter[7], counter[10], counter[11]]
 
     colors1 = ['#FFC300', '#3498DB', '#E74C3C']  # 自定义颜色
 
     pie_chart1 = go.Pie(labels=labels1, values=values1, textinfo='label', marker=dict(colors=colors1))
 
     pie_chart_layout1 = go.Layout(
-        margin=dict(l=50, r=50, t=50, b=50),
+        margin=dict(l=0, r=0, t=0, b=0),
         showlegend=False
     )
 
     pie_chart_fig1 = go.Figure(data=[pie_chart1], layout=pie_chart_layout1)
-    pie_chart_fig1.update_traces(hole=0.4)
+    pie_chart_fig1.update_traces(hole=0.2)
 
     pie_chart_div1 = pie_chart_fig1.to_html(full_html=False, default_height=250)
 
     # 生成饼状图2
-    labels2 = ['低危漏洞', '中危漏洞', '高危漏洞']
-    values2 = [0, medium_vulnerabilities, 0]
-
-    colors2 = ['#FFC300', '#3498DB', '#E74C3C']  # 自定义颜色
+    labels2 = ['目录遍历漏洞', '文件上传下载漏洞', 'XSS Href', 'XSS Stored', 'XSS JavaScript', 'XSS DOM']
+    values2 = [counter[2], counter[3], counter[9], counter[12], counter[13], counter[14]]
+    colors2 = ['#FFA500', '#800080', '#FFC0CB', '#A52A2A', '#00FFFF', '#808080']  # 自定义颜色
 
     pie_chart2 = go.Pie(labels=labels2, values=values2, textinfo='label', marker=dict(colors=colors2))
 
     pie_chart_layout2 = go.Layout(
-        margin=dict(l=50, r=50, t=50, b=50),
+        margin=dict(l=0, r=0, t=0, b=0),
         showlegend=False
     )
 
     pie_chart_fig2 = go.Figure(data=[pie_chart2], layout=pie_chart_layout2)
-    pie_chart_fig2.update_traces(hole=0.4)
+    pie_chart_fig2.update_traces(hole=0.2)
 
     pie_chart_div2 = pie_chart_fig2.to_html(full_html=False, default_height=250)
 
     # 生成饼状图3
-    labels3 = ['低危漏洞', '中危漏洞', '高危漏洞']
-    values3 = [0, 0, high_vulnerabilities]
+    labels3 = ['暴力破解', '文件包含漏洞', 'SQL time blinds',
+               'SQL bool blinds', 'SQL inject vul', 'PHP反序列化']
+    values3 = [counter[0], counter[1], counter[4], counter[5], counter[6], counter[8]]
 
-    colors3 = ['#FFC300', '#3498DB', '#E74C3C']  # 自定义颜色
+    colors3 = ['#FFA500', '#800080', '#FFC0CB', '#A52A2A', '#00FFFF', '#808080']  # 自定义颜色
 
     pie_chart3 = go.Pie(labels=labels3, values=values3, textinfo='label', marker=dict(colors=colors3))
 
     pie_chart_layout3 = go.Layout(
-        margin=dict(l=50, r=50, t=50, b=50),
+        margin=dict(l=0, r=0, t=0, b=0),
         showlegend=False
     )
 
     pie_chart_fig3 = go.Figure(data=[pie_chart3], layout=pie_chart_layout3)
-    pie_chart_fig3.update_traces(hole=0.4)
+    pie_chart_fig3.update_traces(hole=0.2)
 
     pie_chart_div3 = pie_chart_fig3.to_html(full_html=False, default_height=250)
 
     return render_template('dashboard.html', pie_chart1=pie_chart_div1, pie_chart2=pie_chart_div2,
                            pie_chart3=pie_chart_div3, target_data=target_data,
                            vulnerabilities_data=vulnerabilities_data)
-@app.route('/user', methods=['GET','POST'])
+
+
+@app.route('/user', methods=['GET', 'POST'])
 def user():
     return render_template('user.html')
 
-@app.route('/fish', methods=['GET','POST'])
+
+@app.route('/fish', methods=['GET', 'POST'])
 def fish():
     # Initialize the dictionary for the response.
     data = {"success": False}
@@ -228,7 +254,6 @@ def fish():
 
         # classify the URL and make the prediction.
 
-
         data["predictions"] = []
 
         # Check for base URL. Accuracy is not as great.
@@ -238,11 +263,12 @@ def fish():
         if "/" not in split2:
             result = "Base URLs cannot be accurately determined."
 
-
         # Show that the request was a success.
         data["success"] = True
     print(flask.jsonify(data))
     return render_template('fish.html')
+
+
 # 主函数
 if __name__ == '__main__':
     # app.debug = True

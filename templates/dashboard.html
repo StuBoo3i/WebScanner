@@ -36,12 +36,12 @@
 
         .chart {
             text-align: center;
-            width: 250px;
-            height: 350px;
-            margin-left: 250px;
-            margin-right: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            width: 400px;
+            height: 400px;
+            margin-left: 80px;
+            margin-right: 5px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
             padding: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
@@ -82,6 +82,18 @@
         .table-container {
             margin-top: 100px; /* 添加上边距，向下移动表格容器 */
         }
+        .table-container {
+            width: 100%;
+        }
+
+        .table-container table:first-child {
+            width: 30%;
+        }
+
+        .table-container table:last-child {
+            width: 70%;
+        }
+
     </style>
 </head>
 <body data-type="generalComponents">
@@ -177,7 +189,6 @@
             <caption>受到攻击的目标</caption>
             <thead>
                 <tr>
-                    <th>URL</th>
                     <th>低危漏洞</th>
                     <th>中危漏洞</th>
                     <th>高危漏洞</th>
@@ -186,7 +197,6 @@
             <tbody>
                 {% for data in target_data %}
                 <tr>
-                    <td>{{ data['url'] }}</td>
                     <td>{{ data['低危漏洞'] }}</td>
                     <td>{{ data['中危漏洞'] }}</td>
                     <td>{{ data['高危漏洞'] }}</td>

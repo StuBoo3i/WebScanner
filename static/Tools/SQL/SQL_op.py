@@ -99,7 +99,7 @@ class SQL:
                 counter[4] += 1
                 time_blinds.append(ret[0])
 
-            pattern6 = r'SQL bool  blinds vulnerability'
+            pattern6 = r'SQL bool blinds  vulnerability'
             if re.search(pattern6, ret[1]) is not None:
                 counter[5] += 1
                 bool_blinds.append(ret[0])
