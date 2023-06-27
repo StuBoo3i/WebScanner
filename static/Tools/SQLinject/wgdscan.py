@@ -4,7 +4,7 @@
 from static.Tools.SQLinject.lib.core.Spider import SpiderMain
 
 def main():
-    root = "http://192.168.1.192:8086/pikachu/"
+    root = "http://192.168.249.131/pikachu/"
     threadNum = 10
     # spider
     wgd = SpiderMain(root, threadNum)

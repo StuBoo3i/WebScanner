@@ -1,132 +1,165 @@
 import mysql.connector
-import json
-
+import re
 
 class SQL:
     def __init__(self):
-        self.cnx = self.connectSQL()
+        self.cnx = self.__connectSQL__()
         self.cursor = self.cnx.cursor()
 
     def __connectSQL__(self):
-
         cnx = mysql.connector.connect(
             host="localhost",
-            user="username",
-            password="password",
-            database="database"
+            user="root",
+            password="100221",
+            database="scanner"
         )
-
         return cnx
 
-    def insertSQL(self, cnx, cursor):
-
-        # # 执行插入语句
-        # insert_query = "INSERT INTO table_name (column1, column2, ...) VALUES (%s, %s, ...)"
-        # values = ("value1", "value2", ...)
-        # cursor.execute(insert_query, values)
-        #
-        # # 提交更改
-        # cnx.commit()
-
-        # 列表转换为字符串
-        data_list = [1, 2, 3, 4]
-        data_str = json.dumps(data_list)
-
+    def insertSQL(self, cnx, cursor, data_list):
         # 执行插入语句
-        insert_query = "INSERT INTO table_name (column_name) VALUES (%s)"
-        values = (data_str,)
+        insert_query = "INSERT INTO url_scanner (url,type) VALUES (%s, %s)"
+        values = tuple(data_list)
         cursor.execute(insert_query, values)
 
         # 提交更改
         cnx.commit()
 
     def selectSQL(self, cursor):
-
-        # select_query = "SELECT * FROM table_name"
-        # cursor.execute(select_query)
-        #
-        # # 获取所有结果
-        # results = cursor.fetchall()
-        #
-        # # 遍历结果
-        # for row in results:
-        #     # 处理每一行数据
-        #     column1 = row[0]
-        #     column2 = row[1]
-        #     # ...
-
-        # # 执行查询语句
-        # select_query = "SELECT column_name FROM table_name"
-        # cursor.execute(select_query)
-        #
-        # # 获取结果
-        # result = cursor.fetchone()
-        # data_str = result[0]
-        #
-        # # 字符串转换为列表
-        # data_list = json.loads(data_str)
-        #
-        # # 遍历列表
-        # for item in data_list:
-        #     print(item)
-
-        # 使用JSON_CONTAINS()函数在查询中进行查找，该函数用于检查JSON数据是否包含指定的值
-
+        """
+        :param cursor: 创建SQL实例之后，填入self.cursor即可
+        :return: 返回一个list表单的list表单，表单中是不同网址的具体url，没有计数，list元素的第一项是漏洞类型描述
+        """
         # 执行查询语句
-        select_query = "SELECT * FROM table_name WHERE JSON_CONTAINS(column_name, %s)"
-        value = '[2]'  # 要查找的列表项
-        cursor.execute(select_query, (value,))
+        select_query = "SELECT url,type FROM url_scanner"
+        cursor.execute(select_query)
 
-        # 获取结果
+        # 获取查询结果
         results = cursor.fetchall()
 
-        # 处理结果
-        for row in results:
-            # 提取JSON字段的值
-            json_data = row[0]
+        list_url = []
+        # 暴力破解
+        bf = ['暴力破解']
+        # 文件包含漏洞
+        include = ['文件包含漏洞']
+        # 目录遍历漏洞
+        dum = ['目录遍历漏洞']
+        # 文件上传和下载漏洞
+        file = ['文件上传和下载漏洞']
+        # SQL time blinds vulnerability
+        time_blinds = ['SQL time blinds vulnerability']
+        # SQL bool  blinds vulnerability
+        bool_blinds = ['SQL bool blinds vulnerability']
+        # SQL inject vulnerability
+        SQL_inject = ['SQL inject vulnerability']
+        # CSRF漏洞
+        CSRF = ['CSRF漏洞']
+        # PHP反序列化漏洞
+        PHP = ['PHP反序列化漏洞']
+        # XSS Href
+        Href = ['XSS Href']
+        # XSS POST Reflected
+        XSS_POST = ['XSS POST Reflected']
+        # XSS GET Reflected
+        XSS_GET = ['XSS GET Reflected']
+        # XSS Stored
+        XSS_Stored = ['XSS Stored']
+        # XSS JavaScript
+        XSS_JavaScript = ['XSS JavaScript']
+        # XSS DOM
+        XSS_DOM = ['XSS DOM']
 
-            # 将JSON字符串转换为Python对象
-            data_list = json.loads(json_data)
+        for ret in results:
+            pattern1 = r'暴力破解漏洞'
+            if re.search(pattern1, ret[1]) is not None:
+                print(ret)
+                bf.append(ret[0])
 
-            # 处理列表数据
-            for item in data_list:
-                print(item)
+            pattern2 = r'文件包含漏洞'
+            if re.search(pattern2, ret[1]) is not None:
+                include.append(ret[0])
 
-    def updataSQL(self, cnx, cursor):
+            pattern3 = r'目录遍历漏洞'
+            if re.search(pattern3, ret[1]) is not None:
+                dum.append(ret[0])
 
-        # 执行更新语句
-        # update_query = "UPDATE table_name SET column1 = %s WHERE condition"
-        # new_value = "new_value"
-        # cursor.execute(update_query, (new_value,))
-        #
-        # # 提交更改
-        # cnx.commit()
+            pattern4 = r'文件上传和下载漏洞'
+            if re.search(pattern4, ret[1]) is not None:
+                file.append(ret[0])
 
-        # 新的列表数据
-        new_data_list = [5, 6, 7]
+            pattern5 = r'SQL time blinds vulnerability'
+            if re.search(pattern5, ret[1]) is not None:
+                time_blinds.append(ret[0])
 
-        # 列表转换为字符串
-        new_data_str = json.dumps(new_data_list)
+            pattern6 = r'SQL bool  blinds vulnerability'
+            if re.search(pattern6, ret[1]) is not None:
+                bool_blinds.append(ret[0])
 
-        # 执行更新语句
-        update_query = "UPDATE table_name SET column_name = %s WHERE condition"
-        values = (new_data_str,)
-        cursor.execute(update_query, values)
+            pattern7 = r'SQL inject vulnerability'
+            if re.search(pattern7, ret[1]) is not None:
+                SQL_inject.append(ret[0])
 
-        # 提交更改
-        cnx.commit()
+            pattern8 = r'CSRF漏洞'
+            if re.search(pattern8, ret[1]) is not None:
+                CSRF.append(ret[0])
+
+            pattern9 = r'PHP反序列化漏洞'
+            if re.search(pattern9, ret[1]) is not None:
+                PHP.append(ret[0])
+
+            pattern10 = r'XSS Href'
+            if re.search(pattern10, ret[1]) is not None:
+                Href.append(ret[0])
+
+            pattern11 = r'XSS POST Reflected'
+            if re.search(pattern11, ret[1]) is not None:
+                XSS_POST.append(ret[0])
+
+            pattern12 = r'XSS GET Reflected'
+            if re.search(pattern12, ret[1]) is not None:
+                XSS_GET.append(ret[0])
+
+            pattern13 = r'XSS Stored'
+            if re.search(pattern13, ret[1]) is not None:
+                XSS_Stored.append(ret[0])
+
+            pattern14 = r'XSS JavaScript'
+            if re.search(pattern14, ret[1]) is not None:
+                XSS_JavaScript.append(ret[0])
+
+            pattern15 = r'XSS DOM'
+            if re.search(pattern15, ret[1]) is not None:
+                XSS_DOM.append(ret[0])
+
+        list_url.append(bf)
+        list_url.append(include)
+        list_url.append(dum)
+        list_url.append(file)
+        list_url.append(time_blinds)
+        list_url.append(bool_blinds)
+        list_url.append(SQL_inject)
+        list_url.append(CSRF)
+        list_url.append(PHP)
+        list_url.append(Href)
+        list_url.append(XSS_POST)
+        list_url.append(XSS_GET)
+        list_url.append(XSS_Stored)
+        list_url.append(XSS_JavaScript)
+        list_url.append(XSS_DOM)
 
     def deleteSQL(self, cnx, cursor):
-
-        # 执行删除语句
-        delete_query = "DELETE FROM table_name WHERE condition"
-        cursor.execute(delete_query)
+        """
+        该函数置空数据空中的表，并重置计数器
+        :param cnx:
+        :param cursor:
+        :return:
+        """
+        truncate_query = "TRUNCATE TABLE url_scanner"
+        cursor.execute(truncate_query)
 
         # 提交更改
         cnx.commit()
 
     def closeSQL(self, cursor, cnx):
-
         # 关闭游标对象和数据库连接
         cursor.close()
         cnx.close()
