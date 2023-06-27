@@ -11,6 +11,7 @@ import tensorflow as tf
 import label_data
 import flask
 import json
+from Web_Vulnerablility.main import scan
 
 app = Flask(__name__)
 
@@ -116,6 +117,7 @@ def student_index():
 # 显示教师首页的函数，可以显示首页里的信息
 @app.route('/scan', methods=['GET','POST'])
 def scan():
+    message = ''
     if request.method == 'POST':
         url = request.form['url']
         scan_mode = request.form['scan_mode']
@@ -124,7 +126,10 @@ def scan():
         proxy_password = request.form['password']
         proxy = request.form['proxy']
         print(url,scan_mode,speed,proxy_name,proxy_password,proxy)
-    return render_template('scan.html')
+        scan(url, scan_mode)# 扫描完成后设置弹窗提示信息
+        message = "扫描已完成！"
+        # 返回响应，并将提示信息传递给模板
+    return render_template('scan.html', message=message)
 
 @app.route('/result', methods=['GET','POST'])
 def result():
