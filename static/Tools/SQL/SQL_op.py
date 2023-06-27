@@ -1,6 +1,7 @@
 import mysql.connector
 import json
 
+
 class SQL:
     def __init__(self):
         self.cnx = self.connectSQL()
@@ -54,20 +55,42 @@ class SQL:
         #     column2 = row[1]
         #     # ...
 
+        # # 执行查询语句
+        # select_query = "SELECT column_name FROM table_name"
+        # cursor.execute(select_query)
+        #
+        # # 获取结果
+        # result = cursor.fetchone()
+        # data_str = result[0]
+        #
+        # # 字符串转换为列表
+        # data_list = json.loads(data_str)
+        #
+        # # 遍历列表
+        # for item in data_list:
+        #     print(item)
+
+        # 使用JSON_CONTAINS()函数在查询中进行查找，该函数用于检查JSON数据是否包含指定的值
+
         # 执行查询语句
-        select_query = "SELECT column_name FROM table_name"
-        cursor.execute(select_query)
+        select_query = "SELECT * FROM table_name WHERE JSON_CONTAINS(column_name, %s)"
+        value = '[2]'  # 要查找的列表项
+        cursor.execute(select_query, (value,))
 
         # 获取结果
-        result = cursor.fetchone()
-        data_str = result[0]
+        results = cursor.fetchall()
 
-        # 字符串转换为列表
-        data_list = json.loads(data_str)
+        # 处理结果
+        for row in results:
+            # 提取JSON字段的值
+            json_data = row[0]
 
-        # 遍历列表
-        for item in data_list:
-            print(item)
+            # 将JSON字符串转换为Python对象
+            data_list = json.loads(json_data)
+
+            # 处理列表数据
+            for item in data_list:
+                print(item)
 
     def updataSQL(self, cnx, cursor):
 
