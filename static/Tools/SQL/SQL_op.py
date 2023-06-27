@@ -9,9 +9,9 @@ class SQL:
     def connectSQL(self):
         cnx = mysql.connector.connect(
             host="localhost",
-            user="your_username",
-            password="your_password",
-            database="your_database"
+            user="username",
+            password="password",
+            database="database"
         )
 
         return cnx
