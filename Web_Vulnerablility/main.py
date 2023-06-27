@@ -185,6 +185,9 @@ def write_list_to_file(file_path, data_list):
         for item in data_list:
             file.write(str(item) + '\n')
 
+def scanweb(url, scan_mode):
+    result = scan_choose(url, scan_mode)
+    write_list_to_file('result.txt', result)
 
 if __name__ == '__main__':
     url = 'http://192.168.1.192:8086/pikachu/'

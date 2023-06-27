@@ -5,13 +5,13 @@ from flask import request
 from flask import render_template
 import plotly.graph_objs as go
 from keras_preprocessing.sequence import pad_sequences
-
+from threading import Thread
 from keras.preprocessing.text import Tokenizer
 import tensorflow as tf
 import label_data
 import flask
 import json
-from Web_Vulnerablility.main import scan
+from Web_Vulnerablility.main import scanweb
 
 app = Flask(__name__)
 
@@ -125,12 +125,13 @@ def scan():
         proxy_name = request.form['username']
         proxy_password = request.form['password']
         proxy = request.form['proxy']
-        print(url,scan_mode,speed,proxy_name,proxy_password,proxy)
-        scan(url, scan_mode)# 扫描完成后设置弹窗提示信息
-        message = "扫描已完成！"
+        thread_1 = Thread(target= subthread_scan,args=(url,scan_mode))
+        thread_1.start()
+        message = "扫描已开始，请勿重复提交请求！"
         # 返回响应，并将提示信息传递给模板
     return render_template('scan.html', message=message)
-
+def subthread_scan(url,scan_mode):
+    scanweb(url, scan_mode)  # 扫描完成后设置弹窗提示信息
 @app.route('/result', methods=['GET','POST'])
 def result():
     data = [
