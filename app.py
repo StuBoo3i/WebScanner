@@ -11,8 +11,9 @@ import tensorflow as tf
 import label_data
 import flask
 import json
-from Web_Vulnerablility.main import scanweb
+from Web_Vulnerablility.main import scanweb,read_list_from_file
 from static.Tools.SQL.SQL_op import SQL
+
 
 app = Flask(__name__)
 
@@ -49,8 +50,8 @@ def prepare_url(url):
 # 传入的是table，数据表的名称，
 # 返回值是数据表中所有的数据，以元祖的格式返回
 # 模拟已知的漏洞列表（可以根据实际情况进行修改）
-sql = SQL()
-counter = sql.selectSQL(sql.cursor)[0]
+sql1 = SQL()
+counter = sql1.selectSQL(sql1.cursor)[0]
 vulnerabilities = {
     'XSS': '跨站脚本攻击（Cross-Site Scripting）',
     'SQLI': 'SQL 注入攻击（SQL Injection）',
@@ -126,16 +127,8 @@ def subthread_scan(url, scan_mode):
 
 @app.route('/result', methods=['GET', 'POST'])
 def result():
-    data = [
-        {
-            'url': 'https://example.com',
-            'count': 10
-        },
-        {
-            'url': 'https://example.org',
-            'count': 5
-        }
-    ]
+    data = read_list_from_file()
+    # print(data)
     return render_template('result.html', data=data)
 
 

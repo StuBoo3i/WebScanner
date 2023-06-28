@@ -5,17 +5,15 @@ import re
 class SQL:
     def __init__(self):
 
-        try:
-            self.cnx = self.__connectSQL__()
-            self.cursor = self.cnx.cursor()
-        except Exception:
-            print("SQL CONNECT ERROR! PLEASE CHANGE YOUR MYSQL SETTING!")
+        self.cnx = self.__connectSQL__()
+        self.cursor = self.cnx.cursor()
+
 
     def __connectSQL__(self):
         cnx = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="123456",
+            password="100221",
             database="scanner"
         )
         return cnx
