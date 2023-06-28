@@ -230,35 +230,41 @@ def user():
 
 @app.route('/fish', methods=['GET', 'POST'])
 def fish():
-    # Initialize the dictionary for the response.
-    data = {"success": False}
+    if request.method == "POST":
+        message = []
+        if 'url' in request.form:
+            # 处理URL表单的逻辑
+            url = request.form['url']
+            # 执行URL表单的处理操作
+            print(url)
+            ans = url_detect(url)
+            if ans == ['bad']:
+                result = "Detection Result for URL: {}".format("是钓鱼网站")
+            else:
+                result = "Detection Result for URL: {}".format("不是钓鱼网站")
+            return jsonify({'urlOrImage': url, 'result': result})
+            print(ans)
+            data = {
+                'url': url,
+                'info': ans
+            }
+            message.append(data)
+        if 'image' in request.form:
 
-    # Check if POST request.
-    if flask.request.method == "POST":
 
-        # Grab and process the incoming json.
-        urlz = []
-        url = request.form['url']
-        urlz.append(url)
-        print(url)
+            image = request.files['image']
 
-        # Process and prepare the URL.
-        url_prepped = prepare_url(urlz)
-
-        # classify the URL and make the prediction.
-
-        data["predictions"] = []
-
-        # Check for base URL. Accuracy is not as great.
-        split = url.split("//")
-        print(split[0])
-        split2 = split[1]
-        if "/" not in split2:
-            result = "Base URLs cannot be accurately determined."
-
-        # Show that the request was a success.
-        data["success"] = True
-    print(flask.jsonify(data))
+            image.save('uploads/' + image.filename)
+            classification = image_detect("uploads/"+image.filename)
+            result = "Detection Result for Image: {}".format(classification)
+            return jsonify({'urlOrImage': 'Uploaded Image', 'result': result})
+            print(classification)
+            data = {
+                'url': url,
+                'info': classification
+            }
+            message.append(data)
+        return render_template('fish.html',message = message)
     return render_template('fish.html')
 
 

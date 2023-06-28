@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-     <meta charset="utf-8">
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Web漏洞扫描系统</title>
     <meta name="description" content="">
@@ -9,13 +9,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="renderer" content="webkit">
     <meta http-equiv="Cache-Control" content="no-siteapp" />
-     <link rel="icon" type="image/png" href="assets/i/favicon.png">
+    <link rel="icon" type="image/png" href="assets/i/favicon.png">
     <link rel="apple-touch-icon-precomposed" href="/static/assets/i/app-icon72x72@2x.png">
     <meta name="apple-mobile-web-app-title" content="Amaze UI" />
     <link rel="stylesheet" href="/static/assets/css/amazeui.min.css" />
     <link rel="stylesheet" href="/static/assets/css/admin.css">
     <link rel="stylesheet" href="/static/assets/css/app.css">
-    <title>Phishing Website Detection</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -87,10 +86,46 @@
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
+
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: greenyellow;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body data-type="generalComponents">
-<header class="am-topbar am-topbar-inverse admin-header">
+    <header class="am-topbar am-topbar-inverse admin-header">
         <div class="am-topbar-brand">
             <a href="javascript:;" class="tpl-logo">
                 <img src="/static/assets/img/logo.png" alt="">
@@ -100,36 +135,24 @@
 
         </div>
 
-
-
         <div class="am-collapse am-topbar-collapse" id="topbar-collapse">
-
             <ul class="am-nav am-nav-pills am-topbar-nav am-topbar-right admin-header-list tpl-header-list">
-
-
             </ul>
         </div>
     </header>
-
- <div class="tpl-page-container tpl-page-header-fixed">
-
-
-          <div class="tpl-page-container tpl-page-header-fixed">
-
-
-           <div class="tpl-left-nav tpl-left-nav-hover">
+    <div class="tpl-page-container tpl-page-header-fixed">
+        <div class="tpl-left-nav tpl-left-nav-hover">
             <div class="tpl-left-nav-title">
                 功能列表
             </div>
             <div class="tpl-left-nav-list">
                 <ul class="tpl-left-nav-menu">
-                   <li class="tpl-left-nav-item">
+                    <li class="tpl-left-nav-item">
                         <a href="/scan" class="nav-link tpl-left-nav-link-list">
                             <i class="am-icon-home"></i>
                             <span>扫描配置</span>
                         </a>
                     </li>
-
                     <li class="tpl-left-nav-item">
                         <a href="/result" class="nav-link tpl-left-nav-link-list">
                             <i class="am-icon-bar-chart"></i>
@@ -157,41 +180,99 @@
                 </ul>
             </div>
         </div>
+        <div class="tpl-page-container tpl-page-header-fixed">
+            <div class="tpl-left-nav tpl-left-nav-hover">
+                <!-- Left navigation content -->
+            </div>
 
-    <div class="form-container">
-        <h1>Phishing Website Detection</h1>
-        <form action="/url_answer" method="post">
-            <label for="url">Target URL:</label>
-            <input type="text" id="url" name="url" required>
+            <div class="form-container">
+                <h1>Phishing Website Detection</h1>
+                <form action="/fish" method="post" onsubmit="showResult(event)">
+                    <label for="url">目标URL：</label>
+                    <input type="text" id="url" name="url">
+                    <input type="submit" value="检测页面">
+                </form>
 
-            <button type="submit">Page Detection</button>
-        </form>
+                <form action="/fish" method="post" onsubmit="showResult(event)">
+                    <label for="image">上传截图：</label>
+                    <input type="file" id="image" name="image" accept="image/*">
+                    <input type="submit" value="检测图像">
+                </form>
 
-        <form action="/image_answer" method="post" enctype="multipart/form-data">
-            <label for="image">Upload Screenshot:</label>
-            <input type="file" id="image" name="image" accept="image/*">
-
-            <button type="submit">Image Detection</button>
-        </form>
-
-        <div class="result-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Phishing Website URL</th>
-                        <th>Phishing Information</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for result in results %}
-                    <tr>
-                        <td>{{ result.url }}</td>
-                        <td>{{ result.info }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                <div id="myModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <table id="resultTable">
+                            <thead>
+                                <tr>
+                                    <th>URL or Image</th>
+                                    <th>Information</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        // 显示弹窗和结果
+ function showResult(event) {
+  event.preventDefault();
+  var modal = document.getElementById("myModal");
+  var span = document.getElementsByClassName("close")[0];
+  var tableBody = document.querySelector("#resultTable tbody");
+
+  // 清空之前的结果
+  tableBody.innerHTML = "";
+
+  // 构建结果行
+  var row = document.createElement("tr");
+  var urlOrImageCell = document.createElement("td");
+  urlOrImageCell.textContent = "Loading...";
+  var informationCell = document.createElement("td");
+  informationCell.textContent = "";
+  row.appendChild(urlOrImageCell);
+  row.appendChild(informationCell);
+  tableBody.appendChild(row);
+
+  // 显示弹窗
+  modal.style.display = "block";
+
+  // 点击关闭按钮关闭弹窗
+  span.onclick = function () {
+    modal.style.display = "none";
+  }
+
+  // 点击弹窗之外的区域关闭弹窗
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+
+  // 发送POST请求
+  fetch(event.target.action, {
+    method: "POST",
+    body: new FormData(event.target)
+  })
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+      // 更新结果行
+      urlOrImageCell.textContent = data.urlOrImage;
+      informationCell.textContent = data.result;
+    })
+    .catch(function (error) {
+      console.log("Error:", error);
+    });
+}
+
+
+    </script>
 </body>
 </html>
