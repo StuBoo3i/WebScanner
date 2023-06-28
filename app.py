@@ -1,6 +1,6 @@
 # -*- coding=utf8 -*-
 # 导入Flask库
-from flask import Flask
+from flask import Flask, jsonify
 from flask import request
 from flask import render_template
 import plotly.graph_objs as go

