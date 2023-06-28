@@ -10,7 +10,7 @@ from torch.utils.data import Dataset, DataLoader
 import numpy as np
 from tqdm.auto import trange
 from typing import Optional, Tuple, Union, TYPE_CHECKING
-
+#引用模型库
 from art.estimators.classification import PyTorchClassifier
 from art.attacks.evasion import ProjectedGradientDescent
 '''

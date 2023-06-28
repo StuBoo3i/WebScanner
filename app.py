@@ -13,7 +13,7 @@ import flask
 import json
 from Web_Vulnerablility.main import scanweb,read_list_from_file
 from static.Tools.SQL.SQL_op import SQL
-
+from phishing.classify import url_detect
 
 app = Flask(__name__)
 

@@ -18,3 +18,8 @@ prediction = loaded_model.predict(input_vector)
 
 # Output the prediction result
 print('Prediction:', prediction)
+
+def url_detect(url):
+    input_vector = vectorizer.transform([url])
+    prediction = loaded_model.predict(input_vector)
+    return prediction
